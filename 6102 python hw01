@@ -37,9 +37,11 @@ def get_daily_return(df_adj_close):
 
     ####### Fill this function to return the daily return mean and std########
     print("Calculating mean and standard deviation...")
-    mean = df_adj_close.mean()
+    sp_daily = df_adj_close.pct_change()
+    sp_daily = sp_daily.dropna()
+    mean = sp_daily.mean()
     print(mean)
-    std = df_adj_close.std()
+    std = sp_daily.std()
     print(std)
 
     ##########################################################################
@@ -56,10 +58,10 @@ def simulate_stock_price(df_adj_close, num_simulations=50):
     """
     mean, std = get_daily_return(df_adj_close)
     s0 = df_adj_close.iloc[0]
-    length = len(df_adj_close)
+    length = len(df_adj_close)-1
     ##### Complete this function for price simulation#################
     print("Simulating...")
-    num_simulations=50
+    
     r = np.random.randn(length, num_simulations)*std + mean
     cum_r = np.cumprod(1+r, axis=0)
     s = s0 * cum_r
@@ -82,11 +84,12 @@ def plot_simulation_with_mean(df_simulation, df_mean, title="Simulation"):
     :param df_mean: dataframe containing the mean-return price series for an asset
     :param title: title of the plot, default "Simulation"
     """
-    assert df_simulation.index == df_mean.index
+    #assert df_simulation.index == df_mean.index
     ##### Complete this function for plot both the simulated price and mean price#################
     print("Plotting simulation...")
+    plt.plot(df_simulation)
     plt.plot(df_mean, color='red', linewidth=4, label='Mean Return')
-    plt.legend('Simulation')
+    plt.legend()
 
     ##############################################################################################
     plt.show()
@@ -108,10 +111,11 @@ def plot_volume_data(df_volume, title="Volume"):
 """
 
 if __name__ == "__main__":
-    #np.random.seed(123)
-    df_adj_close = get_stock_data('/Users/cherrie/Desktop/肖雨晗/master/6102/S&P500.csv', columns='Adj Close')
+    np.random.seed(123)
+    df_adj_close = get_stock_data('C:/Users/cczq/Desktop/6102/S&P500.csv', columns='Adj Close')
     #df_volume = get_stock_data('/Users/cherrie/Desktop/肖雨晗/master/S&P500.csv', columns='Volume')
     print("Data Retrived")
     df_simulation, df_mean = simulate_stock_price(df_adj_close, num_simulations=100)
+    print(df_simulation, df_mean)
     plot_simulation_with_mean(df_simulation, df_mean)
     #plot_volume_data(df_volume)
