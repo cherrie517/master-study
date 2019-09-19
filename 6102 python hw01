@@ -22,6 +22,7 @@ def get_stock_data(path, columns=None):
     """
     print("Retrieving Data...")
     df = pd.read_csv(path)
+    df['Date'] = pd.to_datetime(df['Date'])
     df = df.set_index('Date')
     if columns is None:
         return df
@@ -37,16 +38,15 @@ def get_daily_return(df_adj_close):
 
     ####### Fill this function to return the daily return mean and std########
     print("Calculating mean and standard deviation...")
-    sp_daily = df_adj_close.pct_change()
-    sp_daily = sp_daily.dropna()
-    mean = sp_daily.mean()
+    df_daily = df_adj_close.pct_change()
+    df_daily = df_daily.dropna()
+    mean = df_daily.mean()
     print(mean)
-    std = sp_daily.std()
+    std = df_daily.std()
     print(std)
 
     ##########################################################################
     return mean, std
-
 
 def simulate_stock_price(df_adj_close, num_simulations=50):
     """
@@ -84,38 +84,40 @@ def plot_simulation_with_mean(df_simulation, df_mean, title="Simulation"):
     :param df_mean: dataframe containing the mean-return price series for an asset
     :param title: title of the plot, default "Simulation"
     """
-    #assert df_simulation.index == df_mean.index
+    assert (df_simulation.index == df_mean.index).all()
     ##### Complete this function for plot both the simulated price and mean price#################
     print("Plotting simulation...")
     plt.plot(df_simulation)
     plt.plot(df_mean, color='red', linewidth=4, label='Mean Return')
+    plt.title(title)
     plt.legend()
 
     ##############################################################################################
     plt.show()
 
-""""
+
 def plot_volume_data(df_volume, title="Volume"):
-    
+    """
     :param df_volume: pandas series that contains volume data, indexed by dates
     :param title: title of the plot, default "Volume"
     :return:
-    
+    """
     ##### Complete this function for plot both the simulated price and mean price#################
     print("Plotting volume data...")
-    
-
+    plt.plot(df_volume)
+    plt.title(title)
+    plt.legend()
 
     ##############################################################################################
     plt.show()
-"""
+
 
 if __name__ == "__main__":
     np.random.seed(123)
-    df_adj_close = get_stock_data('C:/Users/cczq/Desktop/6102/S&P500.csv', columns='Adj Close')
-    #df_volume = get_stock_data('/Users/cherrie/Desktop/肖雨晗/master/S&P500.csv', columns='Volume')
+    df_adj_close = get_stock_data('/Users/cherrie/Desktop/肖雨晗/master/6102/S&P500.csv', columns='Adj Close')
+    df_volume = get_stock_data('/Users/cherrie/Desktop/肖雨晗/master/S&P500.csv', columns='Volume')
     print("Data Retrived")
     df_simulation, df_mean = simulate_stock_price(df_adj_close, num_simulations=100)
     print(df_simulation, df_mean)
     plot_simulation_with_mean(df_simulation, df_mean)
-    #plot_volume_data(df_volume)
+    plot_volume_data(df_volume)
